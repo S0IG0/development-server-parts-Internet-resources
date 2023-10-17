@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://db-posgresql:5432/dbname
+    username: dbuser
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    cors:
+      allow-credentials: true
+      allowed-origins:
+        - http://localhost/
+        - http://localhost:8080/
+        - http://localhost:8081/
+        - http://localhost:8082/
+server:
+  port: 8081
