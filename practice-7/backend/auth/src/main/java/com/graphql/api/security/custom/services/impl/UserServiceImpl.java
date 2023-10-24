@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByUsername(user.getUsername()) != null) {
             return null;
         }
-        if (user.getRoles() == null || user.getRoles().size() == 0) {
+        if (user.getRoles() == null || user.getRoles().isEmpty()) {
             user.setRoles(Collections.singleton(roleService.findByName(ERole.ROLE_USER.toString())));
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));

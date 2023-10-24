@@ -1,22 +1,18 @@
 package com.graphql.api.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.graphql.client.HttpGraphQlClient;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import com.graphql.api.security.operations.SecureOperations;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
-import graphql.schema.DataFetchingEnvironment;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @Component
@@ -24,66 +20,43 @@ import java.lang.reflect.Type;
 @RestController
 public class ApiController {
 
-    final HttpServletRequest request;
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    @RequestMapping(method = RequestMethod.POST, path = "/graphql")
+    String universalController(@RequestBody String graphqlQuery) {
 
-    @Autowired
-    public ApiController(HttpServletRequest request) {
-        this.request = request;
+//        String error = validateQuery(graphqlQuery);
+//        if (error != null) {
+//            return error;
+//        }
+
+        RestTemplate restTemplate = new RestTemplate();
+        String serviceUrl = "http://localhost:8080/graphql";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> request = new HttpEntity<>(graphqlQuery, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(serviceUrl, request, String.class);
+        return response.getBody();
     }
 
-    @QueryMapping
-    public Object findAllCategories(DataFetchingEnvironment environment) throws JsonProcessingException {
-        return makeRequest(environment);
+    String buildError(String message, String classification) {
+        String template = "{\"errors\":[{\"message\":\"%s\",\"locations\":null,\"extensions\":{\"classification\":\"%s\"}}]}";
+        return String.format(template, message, classification);
     }
 
-
-    @QueryMapping
-    public Object findCategoryById(DataFetchingEnvironment environment) throws JsonProcessingException {
-        return makeRequest(environment);
-    }
-
-
-    public Object makeRequest(DataFetchingEnvironment environment) throws JsonProcessingException {
-        JsonNode jsonNode = new ObjectMapper().readTree(request.getAttribute("query").toString());
-        String query = jsonNode.get("query")
-                .toString()
-                .replace("\\n", "")
-                .replace("\\t", " ")
-                .replace("\"", "");
-        try {
-            query.substring(0, query.indexOf("#"));
-        } catch (StringIndexOutOfBoundsException ignored) {
-
-        }
-
-        HttpGraphQlClient graphQlClient = HttpGraphQlClient.builder()
-                .url("http://localhost:8080/graphql")
-                .build();
-
-        ParameterizedTypeReference<?> responseType = createParameterizedTypeReference();
-
-        Mono<?> responseMono = graphQlClient
-                .document(query)
-                .retrieve(environment.getField().getName())
-                .toEntity(responseType);
-
-        return responseMono.block();
-    }
-
-    private ParameterizedTypeReference<?> createParameterizedTypeReference() {
-        Type returnType = getClass()
-                .getMethods()[0]
-                .getGenericReturnType();
-
-        if (returnType instanceof ParameterizedType parameterizedType) {
-            Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-
-            if (actualTypeArguments.length > 0) {
-                Type elementType = actualTypeArguments[0];
-                return ParameterizedTypeReference.forType(elementType);
+    String validateQuery(String graphqlQuery) {
+        List<String> operations = new ArrayList<>();
+        for (SecureOperations operation : SecureOperations.values()) {
+            if (graphqlQuery.contains(operation.toString())) {
+                operations.add(operation.toString());
             }
         }
 
-        return ParameterizedTypeReference.forType(Object.class);
+        if (!operations.isEmpty()) {
+            return buildError(operations + ": required authorization", "Authorization");
+        }
+        return null;
     }
 }
+

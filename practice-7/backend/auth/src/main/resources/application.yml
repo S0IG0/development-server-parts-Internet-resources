@@ -5,7 +5,9 @@ spring:
     password: pass
     driver-class-name: org.postgresql.Driver
   jpa:
-    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+#    show-sql: true
     properties:
       hibernate:
         format_sql: true
@@ -21,5 +23,18 @@ spring:
         - http://localhost/
         - http://localhost:8080/
         - http://localhost:8082/
+jwt:
+  type: Bearer
+  refresh:
+    timeLife:
+      days: 20
+      minutes: 0
+    key: zL1HB3Pch05Avfynovxrf/kpF9O2m4NCWKJUjEp27s9J2jEG3ifiKCGylaZ8fDeoONSTJP/wAzKawB8F9rOMNg==
+  access:
+    timeLife:
+      days: 0
+      minutes: 1
+    key: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==
+
 server:
   port: 8081

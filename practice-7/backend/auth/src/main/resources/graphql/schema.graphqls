@@ -195,8 +195,30 @@ type Cart {
     items: [CountItem]
 }
 
+input JwtRequest {
+    username: String!
+    password: String!
+}
+
+input JwtRefreshRequest {
+    refreshToken: String!
+}
+
+type JwtResponse {
+    accessToken: String!
+    refreshToken: String!
+}
+
 
 type Mutation {
+    createUser(user: UserInput!): User
+    login(jwtRequest: JwtRequest!): JwtResponse
+    refreshAccessToken(jwtRefreshRequest: JwtRefreshRequest!): JwtResponse
+
+    logout(refreshToken: String!): String
+    logoutAllSessions(refreshToken: String!): String
+
+
     createCategory(category: CategoryInput!): Category!
     deleteCategoryById(id: Int!): Boolean
 
@@ -234,6 +256,9 @@ type Mutation {
 }
 
 type Query {
+    getUserByRefreshToken(jwtRefreshRequest: JwtRefreshRequest!): User
+
+
     findCategoryById(id: Int!): Category
     findAllCategories: [Category!]!
 

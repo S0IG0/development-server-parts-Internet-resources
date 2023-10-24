@@ -197,6 +197,7 @@ type Cart {
 
 
 type Mutation {
+    createUser(user: UserInput!): User
     createCategory(category: CategoryInput!): Category!
     deleteCategoryById(id: Int!): Boolean
 

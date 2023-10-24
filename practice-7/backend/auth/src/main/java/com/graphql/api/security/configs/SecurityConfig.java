@@ -5,20 +5,22 @@ import com.graphql.api.security.custom.models.User;
 import com.graphql.api.security.custom.models.enumerates.ERole;
 import com.graphql.api.security.custom.services.RoleService;
 import com.graphql.api.security.custom.services.UserService;
+import com.graphql.api.security.jwt.filters.JwtFilter;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,23 +29,26 @@ import java.util.List;
 @Slf4j
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final RoleService roleService;
+    private final JwtFilter jwtFilter;
 
     @Autowired
     public SecurityConfig(
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder,
             UserService userService,
-            RoleService roleService
-    ) {
+            RoleService roleService,
+            JwtFilter jwtFilter) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.userService = userService;
         this.roleService = roleService;
+        this.jwtFilter = jwtFilter;
     }
 
     @Autowired
@@ -59,22 +64,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> {
-                            try {
-                                authorize
-                                        .requestMatchers("/login").permitAll()
-                                        .requestMatchers("/register").permitAll()
-                                        .anyRequest().authenticated();
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                )
-                .formLogin(Customizer.withDefaults())
-                .logout(Customizer.withDefaults());
-
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/graphql").permitAll()
+                        .requestMatchers("/graphiql").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/register").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+        ;
         return http.build();
     }
 
