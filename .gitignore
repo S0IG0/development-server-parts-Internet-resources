@@ -4,3 +4,5 @@
 */nginx/logs
 */apache/logs
 **/swagger/
+**/node_modules
+**/package-lock.json
