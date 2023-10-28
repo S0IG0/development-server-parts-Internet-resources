@@ -13,7 +13,7 @@ function App() {
 
     const [files, setFiles] = useState<FileResponse[] | null>(null)
     const getAllFiles = () => {
-        axios.get("http://localhost/api/files")
+        axios.get("https://localhost/api/files")
             .then(response => {
                 setFiles(response.data)
             })
@@ -25,7 +25,7 @@ function App() {
 
 
     const deleteFile = (id: string) => {
-        axios.delete(`http://localhost/api/files/${id}`).then(() => getAllFiles());
+        axios.delete(`https://localhost/api/files/${id}`).then(() => getAllFiles());
     }
 
     const [active, setActive] = useState<boolean>(false)
@@ -56,7 +56,7 @@ function App() {
                             </>,
                             info: <>
                                 <div className="btn btn-secondary" onClick={() => {
-                                    axios.get(`http://localhost/api/files/info/${item.Id}`)
+                                    axios.get(`https://localhost/api/files/info/${item.Id}`)
                                         .then(response => {
                                             console.log(response.data)
                                             setContent(
@@ -97,7 +97,7 @@ function App() {
                             </>,
                             download: <>
                                 <a className="btn btn-success"
-                                   href={`http://localhost/api/files/${item.Id}`}>download</a>
+                                   href={`https://localhost/api/files/${item.Id}`}>download</a>
                             </>,
                         }
                     })}

@@ -21,7 +21,7 @@ export const ChoiceFile: FC<Props> = ({updateFiles, id}) => {
             return axios.request({
                 method: id ? "put" : "post",
                 maxBodyLength: Infinity,
-                url: 'http://localhost/api/files' + (id ? `/${id}` : ""),
+                url: 'https://localhost/api/files' + (id ? `/${id}` : ""),
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Accept': "*/*"

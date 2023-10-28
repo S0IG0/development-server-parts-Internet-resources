@@ -8,6 +8,8 @@ import (
 // ConfigureRouter настраивает маршруты для вашего HTTP-сервера.
 func ConfigureRouter(handlers *Handlers) *mux.Router {
 	r := mux.NewRouter()
+	r.Use(mux.CORSMethodMiddleware(r))
+
 
 	r.HandleFunc("/files/{id}", handlers.GetFileByID).Methods(http.MethodGet)
 	r.HandleFunc("/files/info/{id}", handlers.GetFileInfoByID).Methods(http.MethodGet)
