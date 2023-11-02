@@ -1,5 +1,6 @@
 import {FC, useState} from "react";
 import axios from "axios";
+import {BACKEND_URL} from "../../http";
 
 interface Props {
     updateFiles?: () => any;
@@ -21,7 +22,7 @@ export const ChoiceFile: FC<Props> = ({updateFiles, id}) => {
             return axios.request({
                 method: id ? "put" : "post",
                 maxBodyLength: Infinity,
-                url: 'https://localhost/api/files' + (id ? `/${id}` : ""),
+                url: `${BACKEND_URL}/api/files` + (id ? `/${id}` : ""),
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     'Accept': "*/*"

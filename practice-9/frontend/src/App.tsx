@@ -3,6 +3,7 @@ import {ReactNode, useEffect, useState} from "react";
 import axios from "axios";
 import {ChoiceFile} from "./components/ui/ChoiceFile.tsx";
 import {ModalWindow} from "./components/ui/ModalWindow.tsx";
+import {BACKEND_URL} from "./http";
 
 export interface FileResponse {
     Id: string,
@@ -13,10 +14,14 @@ function App() {
 
     const [files, setFiles] = useState<FileResponse[] | null>(null)
     const getAllFiles = () => {
-        axios.get("https://localhost/api/files")
+        axios.get(`${BACKEND_URL}/api/files`)
             .then(response => {
-                setFiles(response.data)
+                setFiles(response.data);
+                setTimeout(getAllFiles, 1000);
             })
+            .catch(() => {
+                setTimeout(getAllFiles, 1000);
+            });
     }
 
     useEffect(() => {
@@ -25,7 +30,7 @@ function App() {
 
 
     const deleteFile = (id: string) => {
-        axios.delete(`https://localhost/api/files/${id}`).then(() => getAllFiles());
+        axios.delete(`${BACKEND_URL}/api/files/${id}`).then(() => getAllFiles());
     }
 
     const [active, setActive] = useState<boolean>(false)
@@ -33,12 +38,6 @@ function App() {
 
     return (
         <>
-            <ModalWindow active={active} setActive={setActive}>
-                <div>
-                    {content}
-                </div>
-            </ModalWindow>
-
             <div className="m-4">
                 <ChoiceFile updateFiles={() => getAllFiles()}/>
             </div>
@@ -56,7 +55,7 @@ function App() {
                             </>,
                             info: <>
                                 <div className="btn btn-secondary" onClick={() => {
-                                    axios.get(`https://localhost/api/files/info/${item.Id}`)
+                                    axios.get(`${BACKEND_URL}/api/files/info/${item.Id}`)
                                         .then(response => {
                                             console.log(response.data)
                                             setContent(
@@ -97,12 +96,18 @@ function App() {
                             </>,
                             download: <>
                                 <a className="btn btn-success"
-                                   href={`https://localhost/api/files/${item.Id}`}>download</a>
+                                   href={`${BACKEND_URL}/api/files/${item.Id}`}>download</a>
                             </>,
                         }
                     })}
                 />
             </div>}
+
+            <ModalWindow active={active} setActive={setActive}>
+                <div>
+                    {content}
+                </div>
+            </ModalWindow>
         </>
     )
 }
