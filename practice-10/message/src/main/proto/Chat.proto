@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package messenger;
+
+service UserService {
+  rpc RegisterUser(UserRequest) returns (JwtResponse);
+  rpc LoginUser(UserRequest) returns (JwtResponse);
+  rpc UpdateAccessToken(RefreshToken) returns (AccessToken);
+}
+
+message UserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message JwtResponse {
+  string refresh = 1;
+  string access = 2;
+}
+
+message RefreshToken {
+  string refresh = 1;
+}
+
+message AccessToken {
+  string access = 1;
+}
+
+
+service MessageService {
+  rpc JoinChannel(Empty) returns (stream Message);
+  rpc SendMessage(Message) returns (Info);
+}
+
+message Empty {
+
+}
+
+message Info {
+  string status = 1;
+}
+
+message Message {
+  string text = 1;
+}
