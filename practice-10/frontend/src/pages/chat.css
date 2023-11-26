@@ -1,0 +1,22 @@
+.message {
+    transition: 0.5s;
+    opacity: 0;
+}
+
+.message.my {
+    transform: translateX(250px);
+}
+
+.message.not-my {
+    transform: translateX(-250px);
+}
+
+.message.entering {
+    opacity: 1;
+    transform: translateX(0px);
+}
+
+.message.entered {
+    opacity: 1;
+    transform: translateX(0px);
+}

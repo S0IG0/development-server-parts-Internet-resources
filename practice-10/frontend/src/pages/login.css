@@ -1,0 +1,71 @@
+.clipboard-body {
+    transition: 0.5s;
+}
+
+.clipboard-body:hover {
+    color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+}
+
+.clipboard-body:hover .clipboard-icon {
+    color: rgba(0, 0, 0, 1);
+    background: rgba(248, 249, 250, 1);
+}
+
+.clipboard-body:active .clipboard-icon {
+    transition: 0.1s;
+    scale: 0.92;
+    color: rgba(0, 0, 0, 1);
+    background: rgba(248, 249, 250, 1);
+}
+
+.clipboard-icon {
+    color: rgba(0, 0, 0, 0);
+    transition: 0.5s;
+    background: rgba(248, 249, 250, 0);
+}
+
+.clipboard-body {
+    transform: translateX(100px);
+
+    opacity: 0.0;
+    transition: 0.5s;
+}
+
+.clipboard-body.entered {
+    opacity: 1;
+    transform: translateX(0px);
+}
+
+.card-text {
+    transition: height 0.5s ease;
+    overflow: hidden;
+    height: 1px;
+}
+
+.card-text.entered {
+    height: 120px;
+}
+
+.alert {
+    transform: translateX(100px);
+    opacity: 0;
+    transition: 0.5s;
+    z-index: 1;
+
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+}
+
+.alert.entering {
+    opacity: 1;
+    transform: translateX(0px);
+}
+
+.alert.exiting {
+    opacity: 0;
+    transform: translateX(-100px);
+}
